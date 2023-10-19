@@ -30,7 +30,11 @@ def minOperations(n):
     while current <= n:
         if current == n:
             return opr
-        if (n - current) == copy:
+        if (n - current) % current == 0:
+            copyAll()
+            paste()
+            continue
+        if (copy > 1) and ((n - current) % copy == 0):
             paste()
             continue
         if ((n % (current + copy) == 0) and (current + copy != 1)):
