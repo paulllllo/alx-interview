@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""A function that determines the fewest number of coins needed to give a total"""
+"""A function that determines the fewest number of coins needed"""
 
 
 def makeChange(coins, total):
