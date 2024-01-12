@@ -1,48 +1,19 @@
 #!/usr/bin/python3
-"""
-Defines function that Calculates the minimum number of operations
-"""
+"""ALX SE"""
 
 
-def minOperations(n):
-    """Calculates the minimum no of operations"""
-    current = 1
-    copy = 0
-    opr = 0
-
-    if n < current:
+def minOperations(n: int) -> int:
+    """Return the minimum number of operations to complete a task"""
+    if n <= 1:
         return 0
 
-    def copyAll():
-        """Copies all chars in file"""
-        nonlocal opr, copy, current
-        opr = opr + 1
-        copy = current
-        return
+    divisor = 2
+    operations = 0
 
-    def paste():
-        """pastes copied chars"""
-        nonlocal opr, copy, current
-        opr = opr + 1
-        current = current + copy
-        return
-
-    while current <= n:
-        if current == n:
-            return opr
-        if (n - current) % current == 0:
-            copyAll()
-            paste()
-            continue
-        if (copy > 1) and ((n - current) % copy == 0):
-            paste()
-            continue
-        if ((n % (current + copy) == 0) and (current + copy != 1)):
-            paste()
-            continue
-        if copy >= current:
-            paste()
-            continue
-        copyAll()
-        paste()
-    return 0
+    while (n > 1):
+        if n % divisor == 0:
+            n //= divisor
+            operations += divisor
+        else:
+            divisor += 1
+    return operations
