@@ -1,56 +1,37 @@
 #!/usr/bin/python3
-"""ALX SE log parsing"""
-
+"""ALX SE log parser solution"""
 import sys
-from collections import defaultdict
+import re
+import signal
 
+if __name__ == "__main__":
+    total_file_size = 0
+    status_code_cnt = {}
+    line_count = 0
 
-def process_line(line):
-    """split every line to capture needed output"""
-    parts = line.strip().split()
-    if len(parts) != 9:
-        return None, None
+    pattern = r"(\S+) - \[(.+)\] \"GET /projects/260 HTTP/1.1\" (\d+) (\d+)"
 
-    status_code = parts[-2]
-
-    try:
-        file_size = int(parts[-1])
-        status_code = int(status_code)
-    except ValueError:
-        return None, None
-
-    return file_size, status_code
-
-
-def print_metrics(total_size, status_codes_count):
-    """print the metric to stdout"""
-    print(f"File size: {total_size}")
-
-    for status_code in sorted(status_codes_count.keys()):
-        print(f"{status_code}: {status_codes_count[status_code]}")
-
-
-def main():
-    """main entry"""
-    total_size = 0
-    status_codes_count = defaultdict(int)
-    line_number = 0
+    def print_metrics():
+        """print the statistics of the metrix on status codes"""
+        global total_file_size, status_code_cnt
+        print("File size: {}".format(total_file_size))
+        for status in sorted(status_code_cnt):
+            print("{}: {}".format(status, status_code_cnt[status]))
 
     try:
         for line in sys.stdin:
-            line_number += 1
-
-            file_size, status_code = process_line(line)
-            if file_size is None or status_code is None:
-                continue
-
-            total_size += file_size
-            status_codes_count[status_code] += 1
-
-            if line_number % 10 == 0:
-                print_metrics(total_size, status_codes_count)
-    finally:
-        print_metrics(total_size, status_codes_count)
-
-
-main()
+            line_count += 1
+            match = re.match(pattern, line)
+            if match:
+                ip, date, status, size = match.groups()
+                size = int(size)
+                total_file_size += size
+                status_code_cnt[status] = status_code_cnt.get(
+                    status, 0) + 1
+                if line_count % 10 == 0:
+                    print_metrics()
+                    line_count += 1
+    except KeyboardInterrupt:
+        """if keyboard interrupt: print stats and exit"""
+        print_metrics()
+        sys.exit()
