@@ -1,37 +1,37 @@
 #!/usr/bin/python3
 """ALX SE log parser solution"""
+
+
 import sys
-import re
-import signal
 
-if __name__ == "__main__":
-    total_file_size = 0
-    status_code_cnt = {}
-    line_count = 0
+cache = {'200': 0, '301': 0, '400': 0, '401': 0,
+         '403': 0, '404': 0, '405': 0, '500': 0}
+total_size = 0
+counter = 0
 
-    pattern = r"(\S+) - \[(.+)\] \"GET /projects/260 HTTP/1.1\" (\d+) (\d+)"
+try:
+    for line in sys.stdin:
+        line_list = line.split(" ")
+        if len(line_list) > 4:
+            code = line_list[-2]
+            size = int(line_list[-1])
+            if code in cache.keys():
+                cache[code] += 1
+            total_size += size
+            counter += 1
 
-    def print_metrics():
-        """print the statistics of the metrix on status codes"""
-        global total_file_size, status_code_cnt
-        print("File size: {}".format(total_file_size))
-        for status in sorted(status_code_cnt):
-            print("{}: {}".format(status, status_code_cnt[status]))
+        if counter == 10:
+            counter = 0
+            print('File size: {}'.format(total_size))
+            for key, value in sorted(cache.items()):
+                if value != 0:
+                    print('{}: {}'.format(key, value))
 
-    try:
-        for line in sys.stdin:
-            line_count += 1
-            match = re.match(pattern, line)
-            if match:
-                ip, date, status, size = match.groups()
-                size = int(size)
-                total_file_size += size
-                status_code_cnt[status] = status_code_cnt.get(
-                    status, 0) + 1
-                if line_count % 10 == 0:
-                    print_metrics()
-                    line_count += 1
-    except KeyboardInterrupt:
-        """if keyboard interrupt: print stats and exit"""
-        print_metrics()
-        sys.exit()
+except Exception as err:
+    pass
+
+finally:
+    print('File size: {}'.format(total_size))
+    for key, value in sorted(cache.items()):
+        if value != 0:
+            print('{}: {}'.format(key, value))
